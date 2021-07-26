@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+
 public class Dino {
    public static void main(String[] args) {
       JFrame frame = new JFrame();
