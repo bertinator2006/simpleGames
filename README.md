@@ -11,3 +11,5 @@ this was originally made by bertinator2006
  - - - - dino game
  - - - - snake
 then you have come to the right place
+
+more games will be added as per user request, just shoot me an email at poudelaayush2006@gmail.com
