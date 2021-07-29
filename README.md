@@ -2,6 +2,10 @@
 A collection of games written in many different languages
 
 this was originally made by bertinator2006
+now it is being worked on by:
+itsYaBoiAdonis
+bertinator2006
+Feng135
 - These games are nothing to ride home about
 - they are extremely low latency
 - all are black and white
