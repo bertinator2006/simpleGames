@@ -25,10 +25,11 @@ void handle_input();
 void throw_error();
 void close_game();
 void update_screen();
-void move_paddles();
+void move_players();
 void init_game();
-int update_ball();
+bool update_ball();
 void debug_statement(int value);
+bool ball_offscreen();
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -65,49 +66,88 @@ int main()
 	while (!quit)
 	{
 		handle_input();
-		move_paddles();
+		move_players();
 
-		update_ball(); //return value checking still to be done
-
+		if (update_ball()) 
+		{
+			//playsound !!!
+		}
 		update_screen();
+
+		if (ball_offscreen())
+			init_game();
 
 		//updating delta time
 		start = end;
 		end = SDL_GetTicks();
 		deltatime_ms = end - start;
-		if (deltatime_ms < 20)
-			SDL_Delay(20 - deltatime_ms );
+		if (deltatime_ms < 10)
+			SDL_Delay(10 - deltatime_ms );
 	}
 	close_game();
 	return 0;
 }
 
+//returns true if the ball is off screen
+bool ball_offscreen()
+{
+	if (ball.rect.x > SCREEN_WIDTH)
+		return true;
+	if (ball.rect.x < -ball.rect.w)
+		return true;
+	if (ball.rect.y < -ball.rect.h)
+		return true;
+	if (ball.rect.y > SCREEN_HEIGHT)
+		return true;
 
-//(incomplete) moves ball for a particular frame, returns true if collision, false otherwise
-int update_ball()
+	return false;
+}
+
+// moves ball for a particular frame, returns true if collision, false otherwise
+bool update_ball()
 {
 	if (!game_start)
 		return 0;
-	
+
+	bool collision = false;
 	int deltax = ball.xvel * GAME_SPEED * deltatime_ms / 1000;
 	int deltay = ball.yvel * GAME_SPEED * deltatime_ms / 1000;
-	int nextx = ball.rect.x + deltax;
-	int nexty = ball.rect.y + deltay;
+	SDL_Rect next;
+	next.x = ball.rect.x + deltax;
+	next.y = ball.rect.y + deltay;
+	next.w = ball.rect.w;
+	next.h = ball.rect.h;
 
-	if (nexty < 0 || nexty + ball.rect.h > SCREEN_HEIGHT)
+	if (next.y < 0 || next.y + ball.rect.h > SCREEN_HEIGHT)
 	{
 		ball.yvel *= -1;
 		deltay *= -1;
+		next.y += deltax;
+		collision = true;
 	}
+	//check collision with players here!!!
+	if (player[0].rect.x < ball.rect.x && SDL_HasIntersection(&next, &player[0].rect))
+	{
+		ball.xvel *= -1;
+		deltax *= -1;
+		collision = true;
+	}
+	if ( ball.rect.x + ball.rect.w < player[1].rect.x + player[1].rect.w && SDL_HasIntersection(&next, &player[1].rect))
+	{
+		ball.xvel *= -1;
+		deltax *= -1;
+		collision = true;
+	}
+
 
 	ball.rect.x += deltax;
 	ball.rect.y += deltay;
 		
 	
-	return 0;
+	return collision;
 }
 
-//(need to add random) Initialises both paddle rects, ball rect and ball velocities
+//(need to add random!!!) Initialises both player rects, ball rect and ball velocities
 void init_game()
 {
 	srand(time(0));
@@ -212,8 +252,8 @@ void close_game()
 	SDL_Quit();
 }
 
-//Moves the paddles depending on direction of travel
-void move_paddles()
+//Moves the players depending on their direction of travel
+void move_players()
 {
 	int new_y_pos;
 	for (int i = 0; i < 2; i++)
