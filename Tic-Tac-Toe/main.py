@@ -61,6 +61,37 @@ def render_board():
                 render_cross(idx,idy)
     pygame.display.flip()
 
+def game_won():
+    pass
+
+def check_win():
+    #checking verticals
+    for i in range(2):
+        for x in range(3):
+            count = 0
+            for y in range(3):
+                if board[y][x] == i+1:
+                    count += 1
+            if count == 3:
+                return i+1
+        
+    #checking horizontals
+    for i in range(2):
+        for x in range(3):
+            count = 0
+            for y in range(3):
+                if board[x][y] == i+1:
+                    count += 1
+            if count == 3:
+                return i+1
+
+    #checking diagonals
+    for i in range(2):
+        for i in range(3):
+            #continue here
+            pass
+    pass
+
 render_board()
 
 running = True
@@ -73,6 +104,7 @@ while running:
             move = check_input(mouse_pos)
             if move!= 0:
                 render_board()
-
-
+                if check_win():
+                    game_won()
+    pass
 
