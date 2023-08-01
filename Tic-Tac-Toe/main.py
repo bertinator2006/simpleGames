@@ -14,12 +14,13 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255,0,0)
 BLUE = (0,0,255)
-screen.fill(WHITE)
-pygame.draw.line(screen, BLACK, (TILE_SIZE, 0), (TILE_SIZE, HEIGHT),3 )
-pygame.draw.line(screen, BLACK, (TILE_SIZE*2 + 1, 0), (TILE_SIZE* 2 + 1, HEIGHT),3 )
-pygame.draw.line(screen, BLACK, (0, TILE_SIZE), (WIDTH, TILE_SIZE),3 )
-pygame.draw.line(screen, BLACK, (0, TILE_SIZE*2 + 1), (WIDTH,TILE_SIZE*2 + 1),3 )
-pygame.display.flip()
+def clear_screen():
+    screen.fill(WHITE)
+    pygame.draw.line(screen, BLACK, (TILE_SIZE, 0), (TILE_SIZE, HEIGHT),3 )
+    pygame.draw.line(screen, BLACK, (TILE_SIZE*2 + 1, 0), (TILE_SIZE* 2 + 1, HEIGHT),3 )
+    pygame.draw.line(screen, BLACK, (0, TILE_SIZE), (WIDTH, TILE_SIZE),3 )
+    pygame.draw.line(screen, BLACK, (0, TILE_SIZE*2 + 1), (WIDTH,TILE_SIZE*2 + 1),3 )
+    pygame.display.flip()
 
 board = [ 
     [0,0,0],
@@ -61,10 +62,23 @@ def render_board():
                 render_cross(idx,idy)
     pygame.display.flip()
 
-def game_won():
+def game_won(winner):
+    global running
+
+    print(f"Player {winner} won")
+    running = False
+    pygame.time.wait(2000)
     pass
 
 def check_win():
+    count = 0
+    for y in board:
+        for x in y:
+            if not x == 0:
+                count+=1
+    
+    if count == 9:
+        return 0
     #checking verticals
     for i in range(2):
         for x in range(3):
@@ -77,6 +91,7 @@ def check_win():
         
     #checking horizontals
     for i in range(2):
+        count = 0
         for x in range(3):
             count = 0
             for y in range(3):
@@ -87,11 +102,21 @@ def check_win():
 
     #checking diagonals
     for i in range(2):
-        for i in range(3):
-            #continue here
-            pass
-    pass
+        count = 0
+        for z in range(3):
+            if board[z][z] == i+1:
+                count += 1
+            if count == 3:
+                return i+1
+        count = 0
+        for z in range(3):
+            if board[2-z][z] == i+1:
+                count += 1
+            if count == 3:
+                return i+1
+    return 3
 
+clear_screen()
 render_board()
 
 running = True
@@ -103,8 +128,17 @@ while running:
             mouse_pos = pygame.mouse.get_pos()
             move = check_input(mouse_pos)
             if move!= 0:
+                clear_screen()
                 render_board()
-                if check_win():
-                    game_won()
+                winner = check_win()
+                if not winner:
+                    running = False
+                    print("Draw")
+                if winner == 1:
+                    game_won(1)
+                if winner == 2:
+                    game_won(2)
+                
     pass
 
+pygame.quit()
